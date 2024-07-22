@@ -1166,8 +1166,8 @@ bool KalmanFastTracking_Displaced::compareTrackletsSlim_3hits(Tracklet *tracklet
         return false;
     double bestMatch = 100.;
 
-    Tracklet *tracklet_2hits = new Tracklet;
-    Tracklet *tracklet_1hit = new Tracklet;
+    Tracklet *tracklet_2hits = nullptr;
+    Tracklet *tracklet_1hit = nullptr;
     if (tracklet2->hits.size() == 2)
     {
         tracklet_2hits = tracklet2;
