@@ -1767,7 +1767,7 @@ void KalmanFastTracking_Displaced::buildGlobalTracksDisplaced()
 	      for(std::list<int>::iterator iter = hitIDs_maskX[0].begin(); iter != hitIDs_maskX[0].end(); ++iter){
 
 		//if( std::abs( hitAll[*iter].pos - (((*tracklet23).tx - 0.002 * charges[ch]*pxSlices[pxs])*(p_geomSvc->getPlanePosition(hitAll[*iter].detectorID) - z_plane[3]) + posx+charges[ch]*pxSlices[pxs]) ) < 5. ){
-		if( std::abs( hitAll[*iter].pos - (((*tracklet23).tx  + charge * PT_KICK_KMAG * (0.0049+(pxSlices[pxs]-1)/2*0.0097))*(p_geomSvc->getPlanePosition(hitAll[*iter].detectorID) - z_plane[3]) + posx-charge * PT_KICK_KMAG * (0.0049+(pxSlices[pxs]-1)/2*0.0097)*500) ) < 5. ){
+		if( std::abs( hitAll[*iter].pos - (((*tracklet23).tx  + charges[ch]* PT_KICK_KMAG * (0.0049+(pxSlices[pxs]-1)/2*0.0097))*(p_geomSvc->getPlanePosition(hitAll[*iter].detectorID) - z_plane[3]) + posx-charges[ch] * PT_KICK_KMAG * (0.0049+(pxSlices[pxs]-1)/2*0.0097)*500) ) < 5. ){
 		
 			hodoFound = true;
 		}
@@ -1801,13 +1801,13 @@ void KalmanFastTracking_Displaced::buildGlobalTracksDisplaced()
 
 	      (*tracklet23).setCharge(charges[ch]);
 	      //double expXZSlope = ((*tracklet23).tx - 0.002 * charges[ch]*pxSlices[pxs]);
-	      double expXZSlope = (*tracklet23).tx + charge * PT_KICK_KMAG * (0.0049+(pxSlices[pxs]-1)/2*0.0097);
+	      double expXZSlope = (*tracklet23).tx + charges[ch] * PT_KICK_KMAG * (0.0049+(pxSlices[pxs]-1)/2*0.0097);
 	      _timers["global_st1"]->restart();
 	      if(!TRACK_DISPLACED){
 		buildTrackletsInStation(i+1, 0, pos_exp, window);
 	      }
 	      if(TRACK_DISPLACED){
-		pos_exp[0] = posx-charge * PT_KICK_KMAG * (0.0049+(pxSlices[pxs]-1)/2*0.0097)*500;
+		pos_exp[0] = posx-charges[ch] * PT_KICK_KMAG * (0.0049+(pxSlices[pxs]-1)/2*0.0097)*500;
 		//get expected U and V positions in station 1
 		double testSt1Upos = p_geomSvc->getCostheta(1) * ( expXZSlope * (z_plane[1] - z_plane[3]) + pos_exp[0]) + p_geomSvc->getSintheta(1) * (tracklet23->ty * z_plane[1] + tracklet23->y0);
 		double testSt1Vpos = p_geomSvc->getCostheta(5) * ( expXZSlope * (z_plane[5] - z_plane[3]) + pos_exp[0]) + p_geomSvc->getSintheta(5) * (tracklet23->ty * z_plane[5] + tracklet23->y0);
