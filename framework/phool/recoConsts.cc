@@ -61,7 +61,7 @@ void recoConsts::set_defaults()
   //Following values are fed to GeomSvc
   set_BoolFlag("OnlineAlignment", false);
   set_BoolFlag("IdealGeom", false);
-
+  set_BoolFlag("NOT_DISPLACED", true);
   set_CharFlag("AlignmentMille", "$E1039_RESOURCE/alignment/run6/align_mille.txt");
   set_CharFlag("AlignmentHodo", "$E1039_RESOURCE/alignment/run6/alignment_hodo.txt");
   set_CharFlag("AlignmentProp", "$E1039_RESOURCE/alignment/run6/alignment_prop.txt");
