@@ -2389,7 +2389,7 @@ void KalmanFastTracking_Displaced::buildTrackletsInStation(int stationID, int li
                     tracklet_new.hits.push_back(SignedHit(hitAll[xiter->second], LR2));
                     tracklet_new.nXHits++;
                 }
-		if(!OLD_TRACKING){
+		if(!OLD_TRACKING && xiter->first>=0 && xiter->second >=0){
 		  tracklet_new.getSlopesX(hitAll[xiter->first], hitAll[xiter->second]); //Here, we find the four possible X-Z lines
 		}
                 //resolveLeftRight(*uiter, LR1, LR2);
@@ -2403,7 +2403,7 @@ void KalmanFastTracking_Displaced::buildTrackletsInStation(int stationID, int li
                     tracklet_new.hits.push_back(SignedHit(hitAll[uiter->second], LR2));
                     tracklet_new.nUHits++;
                 }
-		if(!OLD_TRACKING){
+		if(!OLD_TRACKING&& uiter->first>=0 && uiter->second >=0){
 		  tracklet_new.getSlopesU(hitAll[uiter->first], hitAll[uiter->second]); //find the four possible U-Z lines
 		}
 
@@ -2418,7 +2418,7 @@ void KalmanFastTracking_Displaced::buildTrackletsInStation(int stationID, int li
                     tracklet_new.hits.push_back(SignedHit(hitAll[viter->second], LR2));
                     tracklet_new.nVHits++;
                 }
-		if(!OLD_TRACKING){
+		if(!OLD_TRACKING && viter->first>=0 && viter->second >=0){
 		  tracklet_new.getSlopesV(hitAll[viter->first], hitAll[viter->second]); //find the four possible V-Z lines
 		}
 
@@ -2801,7 +2801,7 @@ void KalmanFastTracking_Displaced::buildTrackletsInStationSlim(int stationID, in
 	}
       }
       
-      if(!OLD_TRACKING){
+      if(!OLD_TRACKING && xiter->first>=0 && xiter->second >=0){
 	tracklet_new.getSlopesX(hitAll[xiter->first], hitAll[xiter->second]); //Here, we find the four possible X-Z lines
       }
       
@@ -2912,7 +2912,7 @@ void KalmanFastTracking_Displaced::buildTrackletsInStationSlimU(int stationID, i
 	}
       }
       
-      if(!OLD_TRACKING){
+      if(!OLD_TRACKING && uiter->first>=0 && uiter->second >=0){
 	tracklet_new.getSlopesU(hitAll[xiter->first], hitAll[xiter->second]); //Here, we find the four possible X-Z lines
       }
       
@@ -3024,7 +3024,7 @@ void KalmanFastTracking_Displaced::buildTrackletsInStationSlimV(int stationID, i
 	}
       }
       
-      if(!OLD_TRACKING){
+      if(!OLD_TRACKING && viter->first>=0 && viter->second >=0){
 	tracklet_new.getSlopesV(hitAll[xiter->first], hitAll[xiter->second]); //Here, we find the four possible X-Z lines
       }
       
