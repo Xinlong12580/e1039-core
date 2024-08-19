@@ -1271,9 +1271,10 @@ void KalmanFastTracking_Displaced::buildFullBackPartialTracksSlim()
 
             // Assign some parameters that get used later
             tracklet_23.z_st2 = trackletX.z_st2;
-            tracklet_23.pos_st2 = trackletX.pos_st2;
+			tracklet_23.pos_st2 = trackletX.pos_st2;
 
             fitTracklet(tracklet_23);
+	/*
             for (auto &hit : tracklet_23.hits)
             {
                 if (hit.sign == 0)
@@ -1294,7 +1295,80 @@ void KalmanFastTracking_Displaced::buildFullBackPartialTracksSlim()
                     }
                 }
             }
+	    */
+			int num0s = 0;
+      		for(std::list<SignedHit>::iterator hit1 = tracklet_23.hits.begin(); hit1 != tracklet_23.hits.end(); ++hit1){
+        		if(hit1->sign == 0){
+	  			num0s++;
+			}
+      		}
 
+      		if(num0s != 2){
+		//Assign hit sign for unknown hits
+			for(std::list<SignedHit>::iterator hit1 = tracklet_23.hits.begin(); hit1 != tracklet_23.hits.end(); ++hit1){
+				if(hit1->sign == 0){
+		    			hit1->sign = 1;
+		    			fitTracklet(tracklet_23);
+		    			double dcaPlus = tracklet_23.chisq;
+		    			hit1->sign = -1;
+		    			fitTracklet(tracklet_23);
+		    			double dcaMinus = tracklet_23.chisq;
+		    			if(std::abs(dcaPlus) < std::abs(dcaMinus)){
+		      				hit1->sign = 1;
+		    			}
+						else{
+		      				hit1->sign = -1;
+		    			}
+	  				}
+				}
+      		}
+      		else{
+				bool assignedOne = false;
+				std::list<SignedHit>::iterator hit1;
+				std::list<SignedHit>::iterator hit2;
+				for(std::list<SignedHit>::iterator hitS = tracklet_23.hits.begin(); hitS != tracklet_23.hits.end(); ++hitS){
+					if(hitS->sign == 0  && !(assignedOne) ){
+				    	hit1 = hitS;
+				    	assignedOne = true;
+				  	}
+				  	if(hitS->sign == 0  && (assignedOne) ){
+				    	hit2 = hitS;
+			        }
+				}
+				int possibility[4][2] = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+				double dcaPlusPlus, dcaPlusMinus, dcaMinusPlus, dcaMinusMinus;
+			
+				hit1->sign = possibility[0][0];
+				hit2->sign = possibility[0][1];
+				fitTracklet(tracklet_23);
+				dcaPlusPlus = tracklet_23.chisq;
+				hit1->sign = possibility[1][0];
+				hit2->sign = possibility[1][1];
+				fitTracklet(tracklet_23);
+				dcaPlusMinus = tracklet_23.chisq;
+				hit1->sign = possibility[2][0];
+				hit2->sign = possibility[2][1];
+				fitTracklet(tracklet_23);
+				dcaMinusPlus = tracklet_23.chisq;
+				hit1->sign = possibility[3][0];
+				hit2->sign = possibility[3][1];
+				fitTracklet(tracklet_23);
+				dcaMinusMinus = tracklet_23.chisq;
+			
+				std::vector<double> dcas = {dcaPlusPlus, dcaPlusMinus, dcaMinusPlus, dcaMinusMinus};
+			
+				double bestdca = 1000;
+				int bestind = 5;
+				for(int dc = 0; dc < dcas.size(); dc++){
+					if(dcas.at(dc)< bestdca){
+				    	bestdca = dcas.at(dc);
+				    	bestind = dc;
+				  	}
+				}
+			
+				hit1->sign = possibility[bestind][0];
+			    hit2->sign = possibility[bestind][1];
+			}
             // Remove bad hits if needed;  Right now this doesn't play nicely with this algorithm
             // removeBadHits(tracklet_23);
 
@@ -1601,7 +1675,7 @@ void KalmanFastTracking_Displaced::buildGlobalTracksDisplaced()
                     if (valid_track_p < 0)
                         valid_track_p = inv_p;
                 }
-                if (validTrackFound && (inv_p - valid_track_p) > 4 * (inv_ps[1] - inv_ps[0]) + 0.000001)///XL: I believe there could be more valid momentum when high pile up. 
+                if (validTrackFound && (inv_p - valid_track_p) > 4 * (inv_ps[1] - inv_ps[0]) - 0.000001)///XL: I believe there could be more valid momentum when high pile up. 
                     break;
             }
         }
