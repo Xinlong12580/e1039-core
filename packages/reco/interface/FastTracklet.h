@@ -297,7 +297,9 @@ public:
     double pos_st3;
     double z_st3;
     double slope_st3;
-
+    //For back partial tracklets storing information for every type of chambers
+    double posall_st2[4];
+    double posall_st3[4];
     // Hodo hits information used to match tracklets in st2 and st3
     std::vector<std::pair<int, int>> allowedHodos;
     std::vector<std::pair<int, int>> matching_combos;

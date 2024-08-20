@@ -1272,7 +1272,14 @@ void KalmanFastTracking_Displaced::buildFullBackPartialTracksSlim()
             // Assign some parameters that get used later
             tracklet_23.z_st2 = trackletX.z_st2;
 			tracklet_23.pos_st2 = trackletX.pos_st2;
-
+             tracklet_23.posall_st2[0]=trackletX.pos_st2; 
+      	    tracklet_23.posall_st2[1] = tracklet_23.y0 + tracklet_23.ty * tracklet_23.z_st2;
+      tracklet_23.posall_st2[2] = trackletU.pos_st2;
+      tracklet_23.posall_st2[3] = trackletV.pos_st2;
+      tracklet_23.posall_st3[0] = trackletX.pos_st3;
+      tracklet_23.posall_st3[1] = tracklet_23.y0 + tracklet_23.ty * trackletX.pos_st3;
+      tracklet_23.posall_st3[2] = trackletU.pos_st3;
+      tracklet_23.posall_st3[3] = trackletV.pos_st3;
             fitTracklet(tracklet_23);
 	/*
             for (auto &hit : tracklet_23.hits)
@@ -2718,7 +2725,19 @@ int KalmanFastTracking_Displaced::reduceTrackletList(std::list<Tracklet> &trackl
         tracklets.pop_front();
         for (std::list<Tracklet>::iterator iter = tracklets.begin(); iter != tracklets.end();)
         {
-            if (iter->stationID < nStations)
+            if (iter->stationID == nStations-1)
+	    {
+                if (iter->similarity(targetList.back()) && std::abs(targetList.back().posall_st2[0] - iter->posall_st2[0]) < 3. &&std::abs(targetList.back().posall_st2[2] - iter->posall_st2[2]) < 3.&&std::abs(targetList.back().posall_st2[3] - iter->posall_st2[3]) < 3.&& std::abs(targetList.back().posall_st3[0] - iter->posall_st3[0]) < 3. &&std::abs(targetList.back().posall_st3[2] - iter->posall_st3[2]) < 3.&&std::abs(targetList.back().posall_st3[3] - iter->posall_st3[3]) < 3. && std::abs(targetList.back().tx - iter->tx) < 0.01 && std::abs(targetList.back().ty - iter->ty) < 0.01)
+                {
+                    iter = tracklets.erase(iter);
+                    continue;
+                }
+                else
+                {
+                    ++iter;
+                }
+	    }
+         else if (iter->stationID < nStations)
             {
                 /// XL: I don't understand the different condition statement here
                 if (iter->similarity(targetList.back()) && std::abs(targetList.back().pos_st2 - iter->pos_st2) < 3. && std::abs(targetList.back().pos_st3 - iter->pos_st3) < 3. && std::abs(targetList.back().tx - iter->tx) < 0.01 && std::abs(targetList.back().ty - iter->ty) < 0.01)
