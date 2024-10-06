@@ -35,13 +35,16 @@
 #ifndef __CINT__
 int SQDigitizer::Init(PHCompositeNode *topNode)
 {
-  if(Verbosity() > 2) std::cout << "SQDigitizer: Init " << detIDByName.size() << std::endl;
+  if (Verbosity() > 2)
+    std::cout << "SQDigitizer: Init " << detIDByName.size() << std::endl;
 
   p_geomSvc = GeomSvc::instance();
-  for(int i = 1; i <= nChamberPlanes+nHodoPlanes+nPropPlanes+nDarkPhotonPlanes; ++i)
+  for (int i = 1; i <= nChamberPlanes + nHodoPlanes + nPropPlanes + nDarkPhotonPlanes; ++i)
   {
-    if(!enableDC1 && (i >= 7 && i <= 12)) continue;
-    if(!enableDPHodo && (i > nChamberPlanes+nHodoPlanes+nPropPlanes && i <= nChamberPlanes+nHodoPlanes+nPropPlanes+nDarkPhotonPlanes)) continue;      
+    if (!enableDC1 && (i >= 7 && i <= 12))
+      continue;
+    if (!enableDPHodo && (i > nChamberPlanes + nHodoPlanes + nPropPlanes && i <= nChamberPlanes + nHodoPlanes + nPropPlanes + nDarkPhotonPlanes))
+      continue;
 
     std::string detName = p_geomSvc->getDetectorName(i);
     detIDByName[detName] = i;
@@ -51,30 +54,31 @@ int SQDigitizer::Init(PHCompositeNode *topNode)
 }
 #endif
 
-SQDigitizer::SQDigitizer(const std::string& name, const int verbose): 
-  SubsysReco(name), 
-  p_geomSvc(nullptr),
-  enableDC1(false),
-  enableDPHodo(true),
-  digitize_secondaries(true)
+SQDigitizer::SQDigitizer(const std::string &name, const int verbose) : SubsysReco(name),
+                                                                       p_geomSvc(nullptr),
+                                                                       enableDC1(false),
+                                                                       enableDPHodo(true),
+                                                                       digitize_secondaries(true)
 {
   detIDByName.clear();
   Verbosity(0);
 }
 
-SQDigitizer::~SQDigitizer() 
-{}
-
-int SQDigitizer::InitRun(PHCompositeNode* topNode) 
+SQDigitizer::~SQDigitizer()
 {
-  if(Verbosity() > 2) std::cout << "SQDigitizer: InitRun " << detIDByName.size() << std::endl;
-  
+}
+
+int SQDigitizer::InitRun(PHCompositeNode *topNode)
+{
+  if (Verbosity() > 2)
+    std::cout << "SQDigitizer: InitRun " << detIDByName.size() << std::endl;
+
   PHNodeIterator iter(topNode);
 
   // Looking for the DST node
   PHCompositeNode *dstNode;
-  dstNode = dynamic_cast<PHCompositeNode*>(iter.findFirst("PHCompositeNode", "DST"));
-  if(!dstNode)
+  dstNode = dynamic_cast<PHCompositeNode *>(iter.findFirst("PHCompositeNode", "DST"));
+  if (!dstNode)
   {
     std::cerr << Name() << " DST Node missing, abort." << std::endl;
     return Fun4AllReturnCodes::ABORTRUN;
@@ -82,21 +86,22 @@ int SQDigitizer::InitRun(PHCompositeNode* topNode)
 
   // Book input g4hits - everything should be present
   hitContainerByName.clear();
-  for(auto it = detIDByName.begin(); it != detIDByName.end(); ++it)
+  for (auto it = detIDByName.begin(); it != detIDByName.end(); ++it)
   {
 
     std::string detName = it->first;
     std::string g4hitNodeName = "G4HIT_" + detName;
-    if(Verbosity() > 2)
+    if (Verbosity() > 2)
     {
       std::cout << Name() << ": booking input G4HIT node " << g4hitNodeName << std::endl;
     }
 
-    PHG4HitContainer* hits = findNode::getClass<PHG4HitContainer>(topNode, g4hitNodeName.c_str());
-    if(!hits)
+    PHG4HitContainer *hits = findNode::getClass<PHG4HitContainer>(topNode, g4hitNodeName.c_str());
+    if (!hits)
     {
-      if(Verbosity() > 2) std::cout << Name() << ": Could not locate g4 hit node " << g4hitNodeName << std::endl;
-      //return Fun4AllReturnCodes::ABORTRUN;
+      if (Verbosity() > 2)
+        std::cout << Name() << ": Could not locate g4 hit node " << g4hitNodeName << std::endl;
+      // return Fun4AllReturnCodes::ABORTRUN;
     }
     else
     {
@@ -105,37 +110,38 @@ int SQDigitizer::InitRun(PHCompositeNode* topNode)
   }
 
   // Exit if there is nothing to work with
-  if(hitContainerByName.empty())
+  if (hitContainerByName.empty())
   {
     std::cerr << Name() << ": no g4hit node foud, abort " << std::endl;
     return Fun4AllReturnCodes::ABORTRUN;
   }
 
-  //Book output SQHits
+  // Book output SQHits
   digits = findNode::getClass<SQHitVector>(topNode, "SQHitVector");
-  if(!digits)
+  if (!digits)
   {
-    if(Verbosity() > 2) std::cout << Name() << ": booking output node SQHitVector" << std::endl;
+    if (Verbosity() > 2)
+      std::cout << Name() << ": booking output node SQHitVector" << std::endl;
 
     digits = new SQHitVector_v1();
-    PHIODataNode<PHObject>* newNode = new PHIODataNode<PHObject>(digits, "SQHitVector", "PHObject");
+    PHIODataNode<PHObject> *newNode = new PHIODataNode<PHObject>(digits, "SQHitVector", "PHObject");
     dstNode->addNode(newNode);
   }
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-int SQDigitizer::process_event(PHCompositeNode* topNode) 
+int SQDigitizer::process_event(PHCompositeNode *topNode)
 {
-  for(auto it = hitContainerByName.begin(); it != hitContainerByName.end(); ++it)
+  for (auto it = hitContainerByName.begin(); it != hitContainerByName.end(); ++it)
   {
-    if(Verbosity() > Fun4AllBase::VERBOSITY_A_LOT)
+    if (Verbosity() > Fun4AllBase::VERBOSITY_A_LOT)
     {
       std::cout << Name() << ": Digitizing hits for " << it->first << std::endl;
     }
 
     int detID = detIDByName[it->first];
-    if(detID <= nChamberPlanes+nHodoPlanes+nPropPlanes+nDarkPhotonPlanes) 
+    if (detID <= nChamberPlanes + nHodoPlanes + nPropPlanes + nDarkPhotonPlanes)
     {
       digitizePlane(it->first);
     }
@@ -148,41 +154,45 @@ int SQDigitizer::process_event(PHCompositeNode* topNode)
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-void SQDigitizer::digitizePlane(const std::string& detName)
+void SQDigitizer::digitizePlane(const std::string &detName)
 {
-  PHG4HitContainer* g4hits = hitContainerByName[detName];
-  if(g4hits->size() < 1) return;
+  PHG4HitContainer *g4hits = hitContainerByName[detName];
+  if (g4hits->size() < 1)
+    return;
 
   int detID = detIDByName[detName];
-  for(PHG4HitContainer::ConstIterator it = g4hits->getHits().first; it != g4hits->getHits().second; ++it)
+  for (PHG4HitContainer::ConstIterator it = g4hits->getHits().first; it != g4hits->getHits().second; ++it)
   {
-    const PHG4Hit& g4hit = *(it->second);
+    const PHG4Hit &g4hit = *(it->second);
 
     int track_id = g4hit.get_trkid();
-    if (! digitize_secondaries && track_id < 0) continue; //only save primary track hits
+    if (!digitize_secondaries && track_id < 0)
+      continue; // only save primary track hits
 
-    //get average momentum and position
-    double x  = 0.5*(g4hit.get_x(0)  + g4hit.get_x(1));
-    double y  = 0.5*(g4hit.get_y(0)  + g4hit.get_y(1));
-    if(!p_geomSvc->isInPlane(detID, x, y)) continue;  //only save in-acceptance hits
+    // get average momentum and position
+    double x = 0.5 * (g4hit.get_x(0) + g4hit.get_x(1));
+    double y = 0.5 * (g4hit.get_y(0) + g4hit.get_y(1));
+    if (!p_geomSvc->isInPlane(detID, x, y))
+      continue; // only save in-acceptance hits
 
-    double z  = 0.5*(g4hit.get_z(0)  + g4hit.get_z(1));
+    double z = 0.5 * (g4hit.get_z(0) + g4hit.get_z(1));
     double px = g4hit.get_px(0);
     double py = g4hit.get_py(0);
     double pz = g4hit.get_pz(0);
-    
-    double tx = px/pz;
-    double ty = py/pz;
-    double x0 = x - tx*z;
-    double y0 = y - ty*z;
+
+    double tx = px / pz;
+    double ty = py / pz;
+    double x0 = x - tx * z;
+    double y0 = y - ty * z;
 
     double z_ref = p_geomSvc->getPlanePosition(detID);
-    double x_ref = tx*z_ref + x0;
-    double y_ref = ty*z_ref + y0;
+    double x_ref = tx * z_ref + x0;
+    double y_ref = ty * z_ref + y0;
 
     double w = p_geomSvc->getInterception(detID, tx, ty, x0, y0);
     int eleID = p_geomSvc->getExpElementID(detID, w);
-    if(eleID < 1 || eleID > p_geomSvc->getPlaneNElements(detID)) continue; //only save hits within active region
+    if (eleID < 1 || eleID > p_geomSvc->getPlaneNElements(detID))
+      continue; // only save hits within active region
 
     SQMCHit_v1 digiHit;
     digiHit.set_track_id(track_id);
@@ -201,8 +211,8 @@ void SQDigitizer::digitizePlane(const std::string& detName)
     digiHit.set_tdc_time(0.);
     digiHit.set_pos(p_geomSvc->getMeasurement(detID, eleID));
 
-    //Drift distance is calculated differently for chamber and hodos
-    if(detID <= nChamberPlanes || (detID > nChamberPlanes+nHodoPlanes && detID <= nChamberPlanes+nHodoPlanes+nPropPlanes))
+    // Drift distance is calculated differently for chamber and hodos
+    if (detID <= nChamberPlanes || (detID > nChamberPlanes + nHodoPlanes && detID <= nChamberPlanes + nHodoPlanes + nPropPlanes))
     {
       digiHit.set_drift_distance(p_geomSvc->getDCA(detID, eleID, tx, ty, x0, y0));
     }
@@ -211,27 +221,27 @@ void SQDigitizer::digitizePlane(const std::string& detName)
       digiHit.set_drift_distance(0.);
     }
 
-    //push the hit to vector
+    // push the hit to vector
     digits->push_back(&digiHit);
 
-    //special treatment for hodoscopes
+    // special treatment for hodoscopes
     double dw = w - digiHit.get_pos();
-    double hodoWidth = p_geomSvc->getCellWidth(detID)/2.;
+    double hodoWidth = p_geomSvc->getCellWidth(detID) / 2.;
     double hodoOverlap = p_geomSvc->getPlaneOverlap(detID);
-    if(fabs(dw) > hodoWidth - hodoOverlap && fabs(dw) < hodoWidth) //hit happens in the overlap region
+    if (fabs(dw) > hodoWidth - hodoOverlap && fabs(dw) < hodoWidth) // hit happens in the overlap region
     {
-      if(dw < 0. && eleID != 1)
+      if (dw < 0. && eleID != 1)
       {
-        digiHit.set_element_id(eleID-1);
-        digiHit.set_pos(p_geomSvc->getMeasurement(detID, eleID-1));
+        digiHit.set_element_id(eleID - 1);
+        digiHit.set_pos(p_geomSvc->getMeasurement(detID, eleID - 1));
         digiHit.set_hit_id(digits->size());
 
         digits->push_back(&digiHit);
       }
-      else if(dw > 0. && eleID != p_geomSvc->getPlaneNElements(detID))
+      else if (dw > 0. && eleID != p_geomSvc->getPlaneNElements(detID))
       {
-        digiHit.set_element_id(eleID+1);
-        digiHit.set_pos(p_geomSvc->getMeasurement(detID, eleID+1));
+        digiHit.set_element_id(eleID + 1);
+        digiHit.set_pos(p_geomSvc->getMeasurement(detID, eleID + 1));
         digiHit.set_hit_id(digits->size());
 
         digits->push_back(&digiHit);
@@ -240,19 +250,21 @@ void SQDigitizer::digitizePlane(const std::string& detName)
   }
 }
 
-void SQDigitizer::digitizeEMCal(const std::string& detName)
+void SQDigitizer::digitizeEMCal(const std::string &detName)
 {
-  PHG4HitContainer* g4hits = hitContainerByName[detName];
-  if(g4hits->size() < 1) return;
+  std::cout << "SQDigitizer: digitizeEMCal" << std::endl;
+  PHG4HitContainer *g4hits = hitContainerByName[detName];
+  if (g4hits->size() < 1)
+    return;
 
   int detID = detIDByName[detName];
-  std::map<int, SQCalHit_v1> digiHits;  //key -> towerID, val -> calHit
-  for(PHG4HitContainer::ConstIterator it = g4hits->getHits().first; it != g4hits->getHits().second; ++it)
+  std::map<int, SQCalHit_v1> digiHits; // key -> towerID, val -> calHit
+  for (PHG4HitContainer::ConstIterator it = g4hits->getHits().first; it != g4hits->getHits().second; ++it)
   {
-    const PHG4Hit& g4hit = *(it->second);
-    
-    int towerID  = g4hit.get_scint_id();
-    if(digiHits.find(towerID) == digiHits.end())
+    const PHG4Hit &g4hit = *(it->second);
+
+    int towerID = g4hit.get_scint_id();
+    if (digiHits.find(towerID) == digiHits.end())
     {
       SQCalMCHit_v1 digiHit;
       digiHit.set_detector_id(detID);
@@ -266,6 +278,8 @@ void SQDigitizer::digitizeEMCal(const std::string& detName)
       digiHit.set_tdc_time(0.);
       digiHit.set_drift_distance(0.);
       digiHit.set_pos(0.);
+      // edep will be updated by add_cell later
+      digiHit.set_edep(0.);
 
       digiHit.set_truth_x(g4hit.get_x(0));
       digiHit.set_truth_y(g4hit.get_y(0));
@@ -280,9 +294,9 @@ void SQDigitizer::digitizeEMCal(const std::string& detName)
     digiHits[towerID].add_cell(g4hit.get_index_l(), g4hit.get_edep());
   }
 
-  for(auto iter = digiHits.begin(); iter != digiHits.end(); ++iter)
+  for (auto iter = digiHits.begin(); iter != digiHits.end(); ++iter)
   {
-    //iter->second.identify();
+    // iter->second.identify();
     iter->second.set_hit_id(digits->size());
     digits->push_back(&(iter->second));
   }
