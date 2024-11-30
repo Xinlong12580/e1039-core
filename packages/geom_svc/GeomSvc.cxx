@@ -559,6 +559,13 @@ void GeomSvc::initWireLUT()
     /// Initialize the position look up table for all wires, hodos, and tubes
     typedef std::unordered_map<int, double>::value_type posType;
     typedef std::unordered_map<int, TVectorD>::value_type epType;
+    for (int i = 1; i <= nChamberPlanes + nHodoPlanes + nPropPlanes + nDarkPhotonPlanes; ++i){
+    	map_wirePosition[i].clear();
+    	map_endPoint1[i].clear();
+    	map_endPoint2[i].clear();
+	planes[i].elementPos.clear();
+    }
+
     for (int i = 1; i <= nChamberPlanes; ++i)
     {
         for (int j = 1; j <= planes[i].nElements; ++j)
