@@ -541,6 +541,12 @@ void GeomSvc::initWireLUT() {
   typedef std::unordered_map<int, TVectorD>::value_type epType;
   for(int i = 1; i <= nChamberPlanes; ++i)
   {
+    for (int i = 1; i <= nChamberPlanes + nHodoPlanes + nPropPlanes + nDarkPhotonPlanes; ++i){
+    	map_wirePosition[i].clear();
+    	map_endPoint1[i].clear();
+    	map_endPoint2[i].clear();
+	planes[i].elementPos.clear();
+    }   
       for(int j = 1; j <= planes[i].nElements; ++j)
       {
           double pos = (j - (planes[i].nElements+1.)/2.)*planes[i].spacing + planes[i].xoffset + planes[i].x0*planes[i].costheta + planes[i].y0*planes[i].sintheta + planes[i].deltaW;
