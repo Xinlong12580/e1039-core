@@ -42,6 +42,17 @@ namespace
     static double SAGITTA_DUMP_WIDTH;
     static double SAGITTA_TARGET_CENTER;
     static double SAGITTA_TARGET_WIDTH;
+    
+    static double SAGITTA_DUMP_CENTER_DC3m[3];
+    static double SAGITTA_DUMP_WIDTH_DC3m[3];
+    static double SAGITTA_TARGET_CENTER_DC3m[3];
+    static double SAGITTA_TARGET_WIDTH_DC3m[3];
+    static double SAGITTA_DUMP_CENTER_DC3p[3];
+    static double SAGITTA_DUMP_WIDTH_DC3p[3];
+    static double SAGITTA_TARGET_CENTER_DC3p[3];
+    static double SAGITTA_TARGET_WIDTH_DC3p[3];
+
+    
     static double Z_TARGET;
     static double Z_DUMP;
 
@@ -112,7 +123,18 @@ namespace
             SAGITTA_TARGET_WIDTH = rc->get_DoubleFlag("SAGITTA_TARGET_WIDTH");
             SAGITTA_DUMP_CENTER = rc->get_DoubleFlag("SAGITTA_DUMP_CENTER");
             SAGITTA_DUMP_WIDTH = rc->get_DoubleFlag("SAGITTA_DUMP_WIDTH");
-            Z_TARGET = rc->get_DoubleFlag("Z_TARGET");
+            
+	     
+            SAGITTA_TARGET_CENTER_DC3m = {rc->get_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3m"), rc->get_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3m"), rc->get_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3m")};
+            SAGITTA_TARGET_WIDTH_DC3m = {rc->get_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3m"), rc->get_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3m"), rc->get_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3m")};
+            SAGITTA_DUMP_CENTER_DC3m = {rc->get_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3m"), rc->get_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3m"), rc->get_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3m")};
+            SAGITTA_DUMP_WIDTH_DC3m = {rc->get_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3m"), rc->get_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3m"), rc->get_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3m")};
+	    
+            SAGITTA_TARGET_CENTER_DC3p = {rc->get_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3p"), rc->get_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3p"), rc->get_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3p")};
+            SAGITTA_TARGET_WIDTH_DC3p = {rc->get_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3p"), rc->get_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3p"), rc->get_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3p")};
+            SAGITTA_DUMP_CENTER_DC3p = {rc->get_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3p"), rc->get_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3p"), rc->get_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3p")};
+            SAGITTA_DUMP_WIDTH_DC3p = {rc->get_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3p"), rc->get_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3p"), rc->get_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3p")};
+	    Z_TARGET = rc->get_DoubleFlag("Z_TARGET");
             Z_DUMP = rc->get_DoubleFlag("Z_DUMP");
 
             MUID_REJECTION = rc->get_DoubleFlag("MUID_REJECTION");
@@ -1772,8 +1794,26 @@ void KalmanFastTracking::getSagittaWindowsInSt1(Tracklet& tracklet, double* pos_
     double z_st3 = z_plane[tracklet.hits.back().hit.detectorID];
     double x_st3 = tracklet.getExpPositionX(z_st3);
     double y_st3 = tracklet.getExpPositionY(z_st3);
-
-    //For U, X, and V planes
+    
+    double SAGITTA_TARGET_CENTER_new[3];
+    double SAGITTA_TARGET_WIDTH_new[3];
+    double SAGITTA_DUMP_CENTER_new[3];
+    double SAGITTA_DUMP_WIDTH_new[3];
+    if (tracklet.hits.back().hit.detectorID >= 25)
+    {
+	    SAGITTA_TARGET_CENTER_new = SAGITTA_TARGET_CENTER_DC3m;
+	    SAGITTA_TARGET_WIDTH_new = SAGITTA_TARGET_WIDTH_DC3m;
+	    SAGITTA_DUMP_CENTER_new = SAGITTA_DUMP_CENTER_DC3m;
+	    SAGITTA_DUMP_WIDTH_new = SAGITTA_DUMP_WIDTH_DC3m;
+    }
+    else
+    {
+	    SAGITTA_TARGET_CENTER_new = SAGITTA_TARGET_CENTER_DC3p;
+	    SAGITTA_TARGET_WIDTH_new = SAGITTA_TARGET_WIDTH_DC3p;
+	    SAGITTA_DUMP_CENTER_new = SAGITTA_DUMP_CENTER_DC3p;
+	    SAGITTA_DUMP_WIDTH_new = SAGITTA_DUMP_WIDTH_DC3p;
+    }
+    //For X, U, and V planes
     for(int i = 0; i < 3; i++)
     {
         int detectorID = (st1ID-1)*6 + 2*i + 2;
@@ -1792,10 +1832,10 @@ void KalmanFastTracking::getSagittaWindowsInSt1(Tracklet& tracklet, double* pos_
         double s2_target = pos_st2 - pos_st3*(z_st2 - Z_TARGET)/(z_st3 - Z_TARGET);
         double s2_dump   = pos_st2 - pos_st3*(z_st2 - Z_DUMP)/(z_st3 - Z_DUMP);
 
-        double pos_exp_target = SAGITTA_TARGET_CENTER*s2_target + pos_st3*(z_st1 - Z_TARGET)/(z_st3 - Z_TARGET);
-        double pos_exp_dump   = SAGITTA_DUMP_CENTER*s2_dump + pos_st3*(z_st1 - Z_DUMP)/(z_st3 - Z_DUMP);
-        double win_target = fabs(s2_target*SAGITTA_TARGET_WIDTH);
-        double win_dump   = fabs(s2_dump*SAGITTA_DUMP_WIDTH);
+        double pos_exp_target = SAGITTA_TARGET_CENTER_new*s2_target + pos_st3*(z_st1 - Z_TARGET)/(z_st3 - Z_TARGET);
+        double pos_exp_dump   = SAGITTA_DUMP_CENTER_new*s2_dump + pos_st3*(z_st1 - Z_DUMP)/(z_st3 - Z_DUMP);
+        double win_target = fabs(s2_target*SAGITTA_TARGET_WIDTH_new);
+        double win_dump   = fabs(s2_dump*SAGITTA_DUMP_WIDTH_new);
 
         double p_min = std::min(pos_exp_target - win_target, pos_exp_dump - win_dump);
         double p_max = std::max(pos_exp_target + win_target, pos_exp_dump + win_dump);
