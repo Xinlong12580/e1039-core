@@ -133,32 +133,32 @@ void recoConsts::set_defaults()
   set_DoubleFlag("SAGITTA_DUMP_CENTER", 1.5);
   set_DoubleFlag("SAGITTA_DUMP_WIDTH", 0.3);
   
-  set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3m", 1.85);
-  set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3m", 0.25);
-  set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3m", 1.5);
-  set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3m", 0.3);
-  set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3p", 1.85);
-  set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3p", 0.25);
-  set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3p", 1.5);
-  set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3p", 0.3);
+  set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3m", 2.11);
+  set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3m", 0.14);
+  set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3m", 1.84);
+  set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3m", 0.21);
+  set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3p", 2.04);
+  set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3p", 0.14);
+  set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3p", 1.78);
+  set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3p", 0.20);
   
-  set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3m", 1.85);
-  set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3m", 0.25);
-  set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3m", 1.5);
-  set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3m", 0.3);
-  set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3p", 1.85);
-  set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3p", 0.25);
-  set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3p", 1.5);
-  set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3p", 0.3);
+  set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3m", 2.00);
+  set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3m", 0.12);
+  set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3m", 1.75);
+  set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3m", 0.19);
+  set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3p", 1.93);
+  set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3p", 0.12);
+  set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3p", 1.70);
+  set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3p", 0.18);
   
-  set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3m", 1.85);
-  set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3m", 0.25);
-  set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3m", 1.5);
-  set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3m", 0.3);
-  set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3p", 1.85);
-  set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3p", 0.25);
-  set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3p", 1.5);
-  set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3p", 0.3);
+  set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3m", 1.89);
+  set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3m", 0.11);
+  set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3m", 1.67);
+  set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3m", 0.17);
+  set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3p", 1.83);
+  set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3p", 0.11);
+  set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3p", 1.62);
+  set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3p", 0.0.16);
   
   set_DoubleFlag("MUID_REJECTION", 4.);
   set_DoubleFlag("MUID_THE_P0", 0.11825);
