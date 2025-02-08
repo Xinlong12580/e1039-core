@@ -158,7 +158,7 @@ void recoConsts::set_defaults()
   set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3p", 1.83);
   set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3p", 0.11);
   set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3p", 1.62);
-  set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3p", 0.0.16);
+  set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3p", 0.16);
   
   set_DoubleFlag("MUID_REJECTION", 4.);
   set_DoubleFlag("MUID_THE_P0", 0.11825);
