@@ -1854,10 +1854,10 @@ void KalmanFastTracking::getSagittaWindowsInSt1(Tracklet& tracklet, double* pos_
         double s2_target = pos_st2 - pos_st3*(z_st2 - Z_TARGET)/(z_st3 - Z_TARGET);
         double s2_dump   = pos_st2 - pos_st3*(z_st2 - Z_DUMP)/(z_st3 - Z_DUMP);
 
-        double pos_exp_target = SAGITTA_TARGET_CENTER_new[i]*s2_target + pos_st3*(z_st1 - Z_TARGET)/(z_st3 - Z_TARGET);
-        double pos_exp_dump   = SAGITTA_DUMP_CENTER_new[i]*s2_dump + pos_st3*(z_st1 - Z_DUMP)/(z_st3 - Z_DUMP);
-        double win_target = fabs(s2_target*SAGITTA_TARGET_WIDTH_new[i]);
-        double win_dump   = fabs(s2_dump*SAGITTA_DUMP_WIDTH_new[i]);
+        double pos_exp_target = SAGITTA_TARGET_CENTER_new[idx]*s2_target + pos_st3*(z_st1 - Z_TARGET)/(z_st3 - Z_TARGET);
+        double pos_exp_dump   = SAGITTA_DUMP_CENTER_new[idx]*s2_dump + pos_st3*(z_st1 - Z_DUMP)/(z_st3 - Z_DUMP);
+        double win_target = fabs(s2_target*SAGITTA_TARGET_WIDTH_new[idx]);
+        double win_dump   = fabs(s2_dump*SAGITTA_DUMP_WIDTH_new[idx]);
 
         double p_min = std::min(pos_exp_target - win_target, pos_exp_dump - win_dump);
         double p_max = std::max(pos_exp_target + win_target, pos_exp_dump + win_dump);
