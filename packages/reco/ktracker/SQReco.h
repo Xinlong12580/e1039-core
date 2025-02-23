@@ -151,6 +151,15 @@ protected:
   bool _use_geom_io_node;
   std::string  _geom_file_name;
   TGeoManager* _t_geo_manager;
+
+  int n_tracks_dc2;
+  int n_tracks_dc3;
+  int n_tracks_back;
+  int n_tracks_full;
+  int n_tracks_kalman;
+  int n_tracks_dc0;
+  int n_tracks_passhodo;
+  int n_tracks_accepted;
 };
 
 #endif

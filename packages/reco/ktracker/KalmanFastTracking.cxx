@@ -36,7 +36,8 @@ namespace
     static int MaxHitsDC2;
     static int MaxHitsDC3p;
     static int MaxHitsDC3m;
-
+    
+    static double ST3_HM_scaling_factor;
     //Sagitta ratio
     static double SAGITTA_DUMP_CENTER;
     static double SAGITTA_DUMP_WIDTH;
@@ -108,7 +109,9 @@ namespace
             INVP_MIN = rc->get_DoubleFlag("INVP_MIN");
             Z_KMAG_BEND = rc->get_DoubleFlag("Z_KMAG_BEND");
 
-            SAGITTA_TARGET_CENTER = rc->get_DoubleFlag("SAGITTA_TARGET_CENTER");
+	    ST3_HM_scaling_factor = rc->get_DoubleFlag("ST3_HM_scaling_factor");
+            
+	    SAGITTA_TARGET_CENTER = rc->get_DoubleFlag("SAGITTA_TARGET_CENTER");
             SAGITTA_TARGET_WIDTH = rc->get_DoubleFlag("SAGITTA_TARGET_WIDTH");
             SAGITTA_DUMP_CENTER = rc->get_DoubleFlag("SAGITTA_DUMP_CENTER");
             SAGITTA_DUMP_WIDTH = rc->get_DoubleFlag("SAGITTA_DUMP_WIDTH");
@@ -426,6 +429,7 @@ void KalmanFastTracking::setRawEventDebug(SRawEvent* event_input)
 
 int KalmanFastTracking::setRawEventPrep(SRawEvent* event_input)
 {
+    for (int i=0;i<20;i++) eval[i]=0;
     //reset timer
     for(auto iter=_timers.begin(); iter != _timers.end(); ++iter) 
     {
@@ -787,6 +791,7 @@ void KalmanFastTracking::buildGlobalTracks()
     double pos_exp[3], window[3];
     for(std::list<Tracklet>::iterator tracklet23 = trackletsInSt[3].begin(); tracklet23 != trackletsInSt[3].end(); ++tracklet23)
     {
+	eval[3]++;
         Tracklet tracklet_best[2];
         for(int i = 0; i < 2; ++i) //for two station-1 chambers
         {
@@ -814,6 +819,7 @@ void KalmanFastTracking::buildGlobalTracks()
 
             _timers["global_link"]->restart();
             Tracklet tracklet_best_prob, tracklet_best_vtx;
+	    eval[0]+=trackletsInSt[0].size();
             for(std::list<Tracklet>::iterator tracklet1 = trackletsInSt[0].begin(); tracklet1 != trackletsInSt[0].end(); ++tracklet1)
             {
               if (verbosity >= 3) {
@@ -824,7 +830,7 @@ void KalmanFastTracking::buildGlobalTracks()
                 Tracklet tracklet_global = (*tracklet23) * (*tracklet1);
                 fitTracklet(tracklet_global);
                 if(!hodoMask(tracklet_global)) continue;
-
+		eval[1]++;
                 ///Resolve the left-right with a tight pull cut, then a loose one, then resolve by single projections
                 if(!COARSE_MODE)
                 {
@@ -838,7 +844,7 @@ void KalmanFastTracking::buildGlobalTracks()
 
                 //Most basic cuts
                 if(!acceptTracklet(tracklet_global)) continue;
-
+		eval[2]++;
                 //Get the tracklets that has the best prob
                 if(tracklet_global < tracklet_best_prob) tracklet_best_prob = tracklet_global;
 
@@ -1422,7 +1428,15 @@ bool KalmanFastTracking::hodoMask(Tracklet& tracklet)
             double y_min = y_mask_min[idx1][idx2] - err_y;
             double y_max = y_mask_max[idx1][idx2] + err_y;
 
-            if (verbosity >= 3) {
+	    if (tracklet.stationID == 4 || tracklet.stationID == 5)
+	    {
+		    x_min = (x_max + x_min)/2 - ST3_HM_scaling_factor * (x_max - x_min)/2;
+		    x_max = (x_max + x_min)/2 + ST3_HM_scaling_factor * (x_max - x_min)/2;
+		    y_min = (y_max + y_min)/2 - ST3_HM_scaling_factor * (y_max - y_min)/2;
+		    y_max = (y_max + y_min)/2 + ST3_HM_scaling_factor * (y_max - y_min)/2;
+	    }
+            
+	    if (verbosity >= 3) {
               LogInfo(*iter);
               hitAll[*iter].print();
               LogInfo(nHodoHits << "/" << stationIDs_mask[tracklet.stationID-1].size() << ":  " << z_hodo << "  " << x_hodo << " +/- " << err_x << "  " << y_hodo << " +/-" << err_y << " : " << x_min << "  " << x_max << "  " << y_min << "  " << y_max);
@@ -1768,17 +1782,18 @@ void KalmanFastTracking::getSagittaWindowsInSt1(Tracklet& tracklet, double* pos_
         }
         return;
     }
-
+    std::cout<<"S3_DETECTORID: "<<tracklet.hits.back().hit.detectorID<<std::endl;
     double z_st3 = z_plane[tracklet.hits.back().hit.detectorID];
     double x_st3 = tracklet.getExpPositionX(z_st3);
     double y_st3 = tracklet.getExpPositionY(z_st3);
-
+    
     //For U, X, and V planes
     for(int i = 0; i < 3; i++)
     {
         int detectorID = (st1ID-1)*6 + 2*i + 2;
         int idx = p_geomSvc->getPlaneType(detectorID) - 1;
 
+	std::cout<<"S_DETECTORID: "<<i<<" "<<detectorID<<" "<<s_detectorID[idx]<<std::endl;
         if(!(idx >= 0 && idx <3)) continue;
 
         double pos_st3 = p_geomSvc->getUinStereoPlane(s_detectorID[idx], x_st3, y_st3);
@@ -1788,7 +1803,7 @@ void KalmanFastTracking::getSagittaWindowsInSt1(Tracklet& tracklet, double* pos_
         double x_st2 = tracklet.getExpPositionX(z_st2);
         double y_st2 = tracklet.getExpPositionY(z_st2);
         double pos_st2 = p_geomSvc->getUinStereoPlane(s_detectorID[idx], x_st2, y_st2);
-
+	std::cout<<"theta relation: "<<x_st2<<" "<<y_st2<<" "<<pos_st2<<std::endl;
         double s2_target = pos_st2 - pos_st3*(z_st2 - Z_TARGET)/(z_st3 - Z_TARGET);
         double s2_dump   = pos_st2 - pos_st3*(z_st2 - Z_DUMP)/(z_st3 - Z_DUMP);
 

@@ -93,6 +93,7 @@ int SQReco::Init(PHCompositeNode* topNode)
 
 int SQReco::InitRun(PHCompositeNode* topNode) 
 {
+	std::cout<<"testinit"<<std::endl;
   if(is_eval_enabled())
   {
     InitEvalTree();
@@ -313,10 +314,18 @@ SRawEvent* SQReco::BuildSRawEvent()
 int SQReco::process_event(PHCompositeNode* topNode) 
 {
   LogDebug("Entering SQReco::process_event: " << _event);
-
   ProcessEventPrep();
 
   int finderstatus = _fastfinder->setRawEvent(_rawEvent);
+  n_tracks_dc2=_fastfinder->getTrackletList(1).size();
+  n_tracks_dc3=_fastfinder->getTrackletList(2).size();
+//n_tracks_back=_fastfinder->getTrackletList(3).size();
+  n_tracks_back=_fastfinder->eval[3];
+  n_tracks_full=_fastfinder->getTrackletList(4).size();
+  n_tracks_dc0=_fastfinder->eval[0];
+  n_tracks_passhodo=_fastfinder->eval[1];
+  n_tracks_accepted=_fastfinder->eval[2];
+
   if(_legacy_rec_container) 
   {
     _recEvent->setRawEvent(_rawEvent);
@@ -358,7 +367,7 @@ int SQReco::process_event(PHCompositeNode* topNode)
     ++nTracklets;
   }
   LogDebug("Leaving SQReco::process_event: " << _event << ", finder status " << finderstatus << ", " << nTracklets << " track candidates, " << nFittedTracks << " fitted tracks");
-
+  n_tracks_kalman=nFittedTracks;
   //add additional eval information if applicable
   if(is_eval_enabled() || is_eval_dst_enabled())
   {
@@ -378,7 +387,8 @@ int SQReco::process_event(PHCompositeNode* topNode)
     }
   }
   
-  if(is_eval_enabled() && nTracklets > 0) _eval_tree->Fill();
+//if(is_eval_enabled() && nTracklets > 0) _eval_tree->Fill();
+ _eval_tree->Fill();
 
   ProcessEventFinish();
 
@@ -481,15 +491,33 @@ int SQReco::InitEvalTree()
 
   _eval_tree = new TTree("eval", "eval");
   _eval_tree->Branch("eventID", &_event, "eventID/I");
+  _eval_tree->Branch("n_tracks_dc2", &n_tracks_dc2, "n_tracks_dc2/I");
+  _eval_tree->Branch("n_tracks_dc3", &n_tracks_dc3, "n_tracks_dc3/I");
+  _eval_tree->Branch("n_tracks_back", &n_tracks_back, "n_tracks_back/I");
+  _eval_tree->Branch("n_tracks_full", &n_tracks_full, "n_tracks_full/I");
+  _eval_tree->Branch("n_tracks_kalman", &n_tracks_kalman, "n_tracks_kalman/I");
+  _eval_tree->Branch("n_tracks_dc0", &n_tracks_dc0, "n_tracks_dc0/I");
+  _eval_tree->Branch("n_tracks_passhodo", &n_tracks_passhodo, "n_tracks_passhodo/I");
+  _eval_tree->Branch("n_tracks_accepted", &n_tracks_accepted, "n_tracks_accepted/I");
   _eval_tree->Branch("tracklets", &_tracklets, 256000, 99);
+  _eval_tree->Branch("FastKalmanTracking",&_fastfinder,25600,99);
+  std::cout<<"Test"<<std::endl;
   _tracklets->BypassStreamer();
-
+  
   return 0;
 }
 
 int SQReco::ResetEvalVars() 
 {
   _tracklets->Clear();
+  n_tracks_dc2=0;
+  n_tracks_dc3=0;
+  n_tracks_back=0;
+  n_tracks_full=0;
+  n_tracks_kalman=0;
+  n_tracks_dc0=0;
+  n_tracks_passhodo=0;
+  n_tracks_accepted=0;
   return 0;
 }
 
