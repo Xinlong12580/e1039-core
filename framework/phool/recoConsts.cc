@@ -126,6 +126,7 @@ void recoConsts::set_defaults()
   //Following numbers are related to the geometric set up thus should not
   //change under most circumstances, unless one is studying the effects of these cuts
   //could be excluded from the configuration set
+  set_DoubleFlag("ST3_HM_scaling_factor", 1.0);
 
   set_IntFlag("MUID_MINHITS", 1);
   set_DoubleFlag("SAGITTA_TARGET_CENTER", 1.85);

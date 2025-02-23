@@ -37,6 +37,7 @@ namespace
     static int MaxHitsDC3p;
     static int MaxHitsDC3m;
 
+    static double ST3_HM_scaling_factor;
     //Sagitta ratio
     static double SAGITTA_DUMP_CENTER;
     static double SAGITTA_DUMP_WIDTH;
@@ -119,7 +120,9 @@ namespace
             INVP_MIN = rc->get_DoubleFlag("INVP_MIN");
             Z_KMAG_BEND = rc->get_DoubleFlag("Z_KMAG_BEND");
 
-            SAGITTA_TARGET_CENTER = rc->get_DoubleFlag("SAGITTA_TARGET_CENTER");
+	    ST3_HM_scaling_factor = rc->get_DoubleFlag("ST3_HM_scaling_factor");
+            
+	    SAGITTA_TARGET_CENTER = rc->get_DoubleFlag("SAGITTA_TARGET_CENTER");
             SAGITTA_TARGET_WIDTH = rc->get_DoubleFlag("SAGITTA_TARGET_WIDTH");
             SAGITTA_DUMP_CENTER = rc->get_DoubleFlag("SAGITTA_DUMP_CENTER");
             SAGITTA_DUMP_WIDTH = rc->get_DoubleFlag("SAGITTA_DUMP_WIDTH");
@@ -1460,6 +1463,13 @@ bool KalmanFastTracking::hodoMask(Tracklet& tracklet)
             double y_min = y_mask_min[idx1][idx2] - err_y;
             double y_max = y_mask_max[idx1][idx2] + err_y;
 
+	    if (tracklet.stationID == 4 || tracklet.stationID == 5)
+	    {
+		    x_min = (x_max + x_min)/2 - ST3_HM_scaling_factor * (x_max - x_min)/2;
+		    x_max = (x_max + x_min)/2 + ST3_HM_scaling_factor * (x_max - x_min)/2;
+		    y_min = (y_max + y_min)/2 - ST3_HM_scaling_factor * (y_max - y_min)/2;
+		    y_max = (y_max + y_min)/2 + ST3_HM_scaling_factor * (y_max - y_min)/2;
+	    }
             if (verbosity >= 3) {
               LogInfo(*iter);
               hitAll[*iter].print();
