@@ -145,6 +145,9 @@ int SQPileupGen::process_event(PHCompositeNode* topNode)
 	_bucketSize  = (int)QIEcount/_proton_coeff;
     }
 
+  TRandom *r3 = new TRandom3(0);
+  double rdm = r3->Rndm();
+  _readIdx = (int)(rdm * (_extTree->GetEntries() - _bucketSize)); 
   //if(!readExtTree(_bucketSize)) return Fun4AllReturnCodes::ABORTEVENT;
   if(!readExtTree(_bucketSize)) return Fun4AllReturnCodes::ABORTRUN;
 
